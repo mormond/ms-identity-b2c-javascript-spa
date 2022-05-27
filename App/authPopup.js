@@ -34,8 +34,8 @@ function selectAccount() {
             &&
             account.idTokenClaims.iss.toUpperCase().includes(b2cPolicies.authorityDomain.toUpperCase())
             &&
-            account.idTokenClaims.aud === msalConfig.auth.clientId 
-            );
+            account.idTokenClaims.aud === msalConfig.auth.clientId
+        );
 
         if (accounts.length > 1) {
             // localAccountId identifies the entity for which the token asserts information.
@@ -152,13 +152,26 @@ function passTokenToApi() {
         });
 }
 
+function callProtectedApi() {
+    const protectedApiRequest = b2cPolicies.authorities.protectedApi;
+    protectedApiRequest.loginHint = myMSALObj.getAccountByHomeId(accountId).username;
+
+    myMSALObj.loginPopup(protectedApiRequest)
+        .then(() => {
+            passTokenToApi();
+        })
+        .catch(error => {
+            console.log(error);
+        });
+}
+
 /**
  * To initiate a B2C user-flow, simply make a login request using
  * the full authority string of that user-flow e.g.
  * https://fabrikamb2c.b2clogin.com/fabrikamb2c.onmicrosoft.com/B2C_1_edit_profile_v2 
  */
 function editProfile() {
-    
+
     const editProfileRequest = b2cPolicies.authorities.editProfile;
     editProfileRequest.loginHint = myMSALObj.getAccountByHomeId(accountId).username;
 
